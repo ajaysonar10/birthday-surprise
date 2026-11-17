@@ -1,0 +1,597 @@
+/* ============================================================
+   Birthday Surprise — the Anywhere Door finale
+   ============================================================ */
+
+/* ----------------------------- animations ----------------------------- */
+
+@keyframes door-hint {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes door-hint-arrow {
+  0%,
+  100% {
+    transform: translateY(2px);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes door-light {
+  0% {
+    opacity: 0;
+    transform: scale(0.55);
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.8;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes door-spark {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.4);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--tx, 0px)), calc(-50% + var(--ty, 0px)))
+      scale(1.15);
+  }
+}
+
+@keyframes reveal-in {
+  0% {
+    opacity: 0;
+    transform: translateY(28px) scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes cake-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(14px) scale(0.82);
+  }
+  55% {
+    opacity: 1;
+    transform: translateY(-8px) scale(1.04);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes flame-flicker {
+  0%,
+  100% {
+    opacity: 0.95;
+    transform: scale(1) rotate(-2deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08, 0.92) rotate(3deg);
+  }
+}
+
+@keyframes halo-breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ------------------------------- section ------------------------------ */
+
+.surprise {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: clamp(64px, 9vw, 110px) clamp(16px, 4vw, 40px)
+    clamp(72px, 10vw, 120px);
+  background:
+    radial-gradient(85% 70% at 15% 0%, rgba(205, 238, 255, 0.9), transparent 62%),
+    radial-gradient(90% 70% at 88% 12%, rgba(255, 214, 231, 0.65), transparent 65%),
+    radial-gradient(100% 70% at 50% 108%, rgba(255, 214, 231, 0.55), transparent 62%),
+    linear-gradient(180deg, #eaf7ff 0%, #f9f6ff 48%, #ffeef7 100%);
+}
+
+.surprise::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(
+    rgba(124, 201, 240, 0.26) 1.4px,
+    transparent 1.4px
+  );
+  background-size: 28px 28px;
+  -webkit-mask-image: radial-gradient(78% 58% at 50% 42%, #000 12%, transparent 76%);
+  mask-image: radial-gradient(78% 58% at 50% 42%, #000 12%, transparent 76%);
+}
+
+.surprise__inner {
+  position: relative;
+  z-index: 2;
+  width: min(820px, 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(22px, 4vw, 36px);
+  text-align: center;
+}
+
+.surprise__head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.surprise__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  margin-bottom: clamp(10px, 2vw, 16px);
+  padding: 0.52em 1.15em;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(124, 201, 240, 0.45);
+  color: #3f7fa5;
+  font-size: clamp(0.68rem, 1.7vw, 0.78rem);
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  box-shadow: 0 8px 18px -14px rgba(64, 150, 205, 0.9);
+}
+
+.surprise__eyebrow-dot {
+  width: 0.55em;
+  height: 0.55em;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--sky-400), var(--pink-400));
+  box-shadow: 0 0 0 4px rgba(124, 201, 240, 0.18);
+}
+
+.surprise__heading {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(1.65rem, 5vw, 2.6rem);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+/* -------------------------------- stage ------------------------------- */
+
+.surprise__stage {
+  position: relative;
+  width: 100%;
+  min-height: clamp(360px, 64vw, 520px);
+  display: grid;
+  place-items: center;
+}
+
+.surprise__door-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(12px, 2vw, 16px);
+  transition:
+    opacity 0.45s ease,
+    transform 0.45s ease,
+    visibility 0s linear 0.45s;
+}
+
+.surprise__door-wrap.is-gone {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.84);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.surprise__door-sign {
+  padding: 0.45em 1.1em;
+  border-radius: 999px;
+  border: 1.5px dashed rgba(255, 143, 184, 0.7);
+  background: rgba(255, 255, 255, 0.75);
+  color: #b8567f;
+  font-family: var(--font-display);
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+/* ------------------------------- the door ----------------------------- */
+
+.door {
+  position: relative;
+  display: block;
+  width: min(224px, 58vw);
+  aspect-ratio: 0.56 / 1;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  perspective: 1200px;
+  filter: drop-shadow(0 30px 34px rgba(64, 150, 205, 0.32));
+  transition:
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.4s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.door:hover {
+  transform: translateY(-6px);
+  filter: drop-shadow(0 38px 40px rgba(64, 150, 205, 0.36));
+}
+
+.door:active {
+  transform: translateY(-2px) scale(0.995);
+}
+
+.door:focus-visible {
+  outline: 3px solid var(--sky-500);
+  outline-offset: 8px;
+  border-radius: 999px;
+}
+
+.door__frame {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px 999px 16px 16px;
+  background: linear-gradient(160deg, #ffd8e8 0%, #ffb6d3 55%, #ff9cc2 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -10px 22px -18px rgba(160, 50, 100, 0.6);
+}
+
+/* the starry space behind the door */
+.door__cosmos {
+  position: absolute;
+  inset: clamp(9px, 2.2vw, 12px);
+  overflow: hidden;
+  border-radius: 999px 999px 12px 12px;
+  background:
+    radial-gradient(2px 2px at 24% 16%, #ffffff 45%, transparent 50%),
+    radial-gradient(1.6px 1.6px at 68% 10%, #ffffff 45%, transparent 50%),
+    radial-gradient(1.8px 1.8px at 82% 34%, #ffffff 45%, transparent 50%),
+    radial-gradient(1.5px 1.5px at 34% 42%, #ffffff 45%, transparent 50%),
+    radial-gradient(2px 2px at 58% 56%, #ffffff 45%, transparent 50%),
+    radial-gradient(1.4px 1.4px at 18% 66%, #ffffff 45%, transparent 50%),
+    radial-gradient(1.8px 1.8px at 76% 74%, #ffffff 45%, transparent 50%),
+    radial-gradient(120% 90% at 50% 88%, #7cc9f0 0%, #4a8fce 36%, #2c5f9e 68%, #1e3f74 100%);
+  box-shadow: inset 0 0 26px -6px rgba(16, 40, 80, 0.8);
+}
+
+.door__light {
+  position: absolute;
+  inset: -30%;
+  background: radial-gradient(
+    circle at 50% 55%,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 230, 244, 0.6) 34%,
+    rgba(255, 214, 231, 0) 68%
+  );
+  opacity: 0;
+  transform: scale(0.55);
+}
+
+.door__sparks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.door__spark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-size: var(--fs, 12px);
+  line-height: 1;
+  color: #ffffff;
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.95);
+  opacity: 0;
+}
+
+/* the door leaf */
+.door__panel {
+  position: absolute;
+  inset: clamp(9px, 2.2vw, 12px);
+  border-radius: 999px 999px 12px 12px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.35), transparent 30%),
+    linear-gradient(160deg, #ffdceb 0%, #ffc0d9 55%, #ffa9c9 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset -8px 0 18px -14px rgba(190, 70, 120, 0.65);
+  transform-origin: 0% 50%;
+  transform: rotateY(0deg);
+  transition: transform 1.05s cubic-bezier(0.62, 0, 0.25, 1);
+  backface-visibility: hidden;
+}
+
+.door__knob {
+  position: absolute;
+  top: 52%;
+  right: clamp(8px, 2.4vw, 14px);
+  width: clamp(11px, 2.8vw, 15px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%, #fff3c9, #ffd04a 62%, #e9ae22);
+  box-shadow: 0 3px 8px -3px rgba(150, 100, 10, 0.8);
+}
+
+.door__decal {
+  position: absolute;
+  top: 16%;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: clamp(14px, 4vw, 18px);
+  text-shadow: 0 2px 6px rgba(200, 80, 130, 0.35);
+}
+
+/* --------------------------- opened state ----------------------------- */
+
+.surprise__door-wrap.is-open .door__panel {
+  transform: rotateY(-108deg);
+}
+
+.surprise__door-wrap.is-open .door__light {
+  animation: door-light 1.15s ease-out forwards;
+}
+
+.surprise__door-wrap.is-open .door__spark {
+  animation: door-spark 0.95s ease-out forwards;
+  animation-delay: var(--delay, 0s);
+}
+
+.surprise__door-wrap.is-open .door:hover {
+  transform: translateY(-3px);
+}
+
+.surprise__door-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  color: #8d9ab4;
+  font-size: clamp(0.8rem, 1.9vw, 0.88rem);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  animation: door-hint 2.6s ease-in-out infinite;
+}
+
+.surprise__door-hint-arrow {
+  font-size: 1.05em;
+  line-height: 1;
+  color: var(--pink-400);
+  animation: door-hint-arrow 2.2s ease-in-out infinite;
+}
+
+/* ------------------------- the surprise reveal ------------------------ */
+
+.surprise__reveal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(12px, 2.4vw, 18px);
+  width: 100%;
+  max-width: 620px;
+  animation: reveal-in 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.surprise__reveal:focus {
+  outline: none;
+}
+
+.surprise__message {
+  width: 100%;
+  padding: clamp(18px, 3.4vw, 26px) clamp(20px, 4vw, 32px);
+  border-radius: clamp(18px, 3vw, 24px);
+  border: 1.5px solid rgba(255, 255, 255, 0.95);
+  background: linear-gradient(
+    165deg,
+    rgba(255, 255, 255, 0.95),
+    rgba(255, 255, 255, 0.78)
+  );
+  box-shadow:
+    0 30px 60px -40px rgba(64, 150, 205, 0.55),
+    0 10px 26px -20px rgba(255, 143, 184, 0.65),
+    inset 0 1px 0 #ffffff;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--ink-soft);
+  font-size: clamp(0.96rem, 2.3vw, 1.04rem);
+  line-height: 1.7;
+  text-wrap: pretty;
+}
+
+.surprise__cake {
+  width: clamp(210px, 46vw, 290px);
+  filter: drop-shadow(0 26px 28px rgba(64, 150, 205, 0.22));
+  animation: cake-pop 0.95s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.cake {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.cake__flame {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: flame-flicker 1.5s ease-in-out infinite;
+}
+
+.cake__halo {
+  animation: halo-breathe 2.4s ease-in-out infinite;
+}
+
+.cake__candle:nth-child(2) .cake__flame,
+.cake__candle:nth-child(2) .cake__halo {
+  animation-delay: -0.45s;
+}
+
+.cake__candle:nth-child(3) .cake__flame,
+.cake__candle:nth-child(3) .cake__halo {
+  animation-delay: -0.9s;
+}
+
+.surprise__caption {
+  color: var(--muted);
+  font-size: clamp(0.86rem, 2vw, 0.95rem);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.surprise__celebrate {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+  margin-top: clamp(2px, 1vw, 6px);
+  padding: 0.95em 2em;
+  border: 0;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(0.98rem, 2.3vw, 1.08rem);
+  color: #ffffff;
+  cursor: pointer;
+  background: linear-gradient(135deg, #7cc9f0 0%, #ffb0d0 58%, #ff9dc5 100%);
+  box-shadow:
+    0 20px 34px -14px rgba(124, 201, 240, 0.85),
+    0 10px 22px -12px rgba(255, 143, 184, 0.75),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  transition:
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.25s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.surprise__celebrate:hover {
+  transform: translateY(-3px) scale(1.02);
+}
+
+.surprise__celebrate:active {
+  transform: translateY(0) scale(0.99);
+}
+
+.surprise__celebrate:focus-visible {
+  outline: 3px solid var(--pink-500);
+  outline-offset: 4px;
+}
+
+.surprise__celebrate-icon {
+  width: 1.1em;
+  height: 1.1em;
+  transition: transform 0.35s ease;
+}
+
+.surprise__celebrate:hover .surprise__celebrate-icon {
+  transform: rotate(90deg) scale(1.1);
+}
+
+.surprise__cheer {
+  min-height: 1.5em;
+  max-width: 44ch;
+  color: #b8567f;
+  font-size: clamp(0.86rem, 2vw, 0.95rem);
+  font-weight: 600;
+  line-height: 1.6;
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease;
+}
+
+.surprise__cheer.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ------------------------------ responsive ---------------------------- */
+
+@media (max-width: 560px) {
+  .door {
+    width: min(196px, 56vw);
+  }
+
+  .surprise__stage {
+    min-height: 380px;
+  }
+
+  .surprise__reveal {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 380px) {
+  .surprise__eyebrow {
+    letter-spacing: 0.1em;
+  }
+}
+
+/* -------------------------- reduced motion ---------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .surprise__reveal,
+  .surprise__cake,
+  .cake__flame,
+  .cake__halo,
+  .surprise__door-hint,
+  .surprise__door-hint-arrow {
+    animation: none !important;
+  }
+
+  .door,
+  .door__panel {
+    transition-duration: 0.01ms !important;
+  }
+
+  .surprise__door-wrap.is-open .door__light {
+    animation: none !important;
+    opacity: 0.8;
+    transform: none;
+  }
+
+  .surprise__door-wrap.is-open .door__spark {
+    animation: none !important;
+    opacity: 0;
+  }
+
+  .surprise__cheer {
+    transition: none;
+  }
+}

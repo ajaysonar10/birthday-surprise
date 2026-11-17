@@ -1,0 +1,100 @@
+/* ============================================================
+   Base theme, reset and design tokens
+   ============================================================ */
+
+:root {
+  /* pastel baby-blue */
+  --sky-50: #f4fcff;
+  --sky-100: #e6f6ff;
+  --sky-200: #cdeeff;
+  --sky-300: #a5ddf7;
+  --sky-400: #7cc9f0;
+  --sky-500: #4aa8dd;
+
+  /* pastel pink */
+  --pink-100: #ffeaf3;
+  --pink-200: #ffd6e7;
+  --pink-300: #ffb3d1;
+  --pink-400: #ff8fb8;
+  --pink-500: #ff6ea3;
+
+  /* accents */
+  --gold-300: #ffe08a;
+  --gold-400: #ffd45e;
+
+  /* ink */
+  --ink: #2f3a52;
+  --ink-soft: #55637e;
+  --muted: #6b7794;
+
+  --font-body: 'Quicksand', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-display: 'Baloo 2', 'Quicksand', 'Segoe UI', system-ui, sans-serif;
+
+  color-scheme: light;
+  font-family: var(--font-body);
+  color: var(--ink);
+  background-color: var(--sky-50);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100svh;
+  background: linear-gradient(180deg, #e9f8ff 0%, #f6fbff 52%, #ffeef6 100%);
+  background-attachment: fixed;
+}
+
+#root {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: var(--sky-500);
+}
+
+::selection {
+  background: rgba(255, 143, 184, 0.35);
+}
+
+/* The configured name, highlighted consistently across every section */
+.name-highlight {
+  background: linear-gradient(
+    100deg,
+    var(--pink-500) 0%,
+    var(--pink-400) 38%,
+    var(--sky-500) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
