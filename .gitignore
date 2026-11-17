@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# Environment variables (never commit secrets)
+.env
+.env.*
+!.env.example
+
 # local visual-regression screenshots (kept on disk, not published)
 visual-checks/
 
