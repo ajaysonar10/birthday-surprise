@@ -1,39 +1,39 @@
 /* ============================================================
-   Base theme, reset and design tokens
+   SIBLING LOVE — base theme, design tokens and shared pieces
+   Palette: midnight navy, Doraemon blue, lavender, soft pink,
+            warm cream and sky blue.
    ============================================================ */
 
 :root {
-  /* pastel baby-blue */
-  --sky-50: #f4fcff;
-  --sky-100: #e6f6ff;
-  --sky-200: #cdeeff;
-  --sky-300: #a5ddf7;
-  --sky-400: #7cc9f0;
-  --sky-500: #4aa8dd;
+  /* --- the six core colours --------------------------------- */
+  --navy: #111b35;
+  --blue: #344d85;
+  --lavender: #b9a5f5;
+  --pink: #f4b8d0;
+  --cream: #fff0d8;
+  --sky: #78ddf5;
 
-  /* pastel pink */
-  --pink-100: #ffeaf3;
-  --pink-200: #ffd6e7;
-  --pink-300: #ffb3d1;
-  --pink-400: #ff8fb8;
-  --pink-500: #ff6ea3;
+  /* --- derived surfaces ------------------------------------- */
+  --navy-2: #172547;
+  --navy-3: #1e2f5c;
+  --navy-glow: #24407a;
 
-  /* accents */
-  --gold-300: #ffe08a;
-  --gold-400: #ffd45e;
+  /* --- ink -------------------------------------------------- */
+  --ink: #0d1730;
+  --ink-soft: #38456b;
+  --on-dark: #f3f1ff;
+  --on-dark-soft: #c3cbe8;
+  --on-light-muted: #5d6788;
 
-  /* ink */
-  --ink: #2f3a52;
-  --ink-soft: #55637e;
-  --muted: #6b7794;
-
+  /* --- type ------------------------------------------------- */
   --font-body: 'Quicksand', 'Segoe UI', system-ui, -apple-system, sans-serif;
   --font-display: 'Baloo 2', 'Quicksand', 'Segoe UI', system-ui, sans-serif;
+  --font-hand: 'Caveat', 'Segoe Script', 'Bradley Hand', cursive;
 
-  color-scheme: light;
+  color-scheme: dark;
   font-family: var(--font-body);
-  color: var(--ink);
-  background-color: var(--sky-50);
+  color: var(--on-dark);
+  background-color: var(--navy);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -45,24 +45,39 @@
   box-sizing: border-box;
 }
 
+html {
+  /* the experience lives in exactly one viewport: no page scrolling */
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
-  min-height: 100svh;
-  background: linear-gradient(180deg, #e9f8ff 0%, #f6fbff 52%, #ffeef6 100%);
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background: var(--navy);
+  /* deep navy base with slow aurora so no section is ever flat */
+  background-image:
+    radial-gradient(90% 60% at 12% 0%, rgba(185, 165, 245, 0.24), transparent 62%),
+    radial-gradient(80% 60% at 92% 18%, rgba(120, 221, 245, 0.18), transparent 64%),
+    radial-gradient(90% 70% at 50% 110%, rgba(244, 184, 208, 0.16), transparent 66%);
   background-attachment: fixed;
 }
 
 #root {
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
 }
 
 h1,
 h2,
 h3,
 h4,
-p {
+p,
+figure {
   margin: 0;
 }
 
@@ -78,23 +93,294 @@ button {
 }
 
 a {
-  color: var(--sky-500);
+  color: var(--sky);
 }
 
 ::selection {
-  background: rgba(255, 143, 184, 0.35);
+  background: rgba(185, 165, 245, 0.45);
+  color: #fff;
 }
 
-/* The configured name, highlighted consistently across every section */
+/* ============================================================
+   Shared building blocks
+   ============================================================ */
+
+/* Section eyebrow pill --------------------------------------- */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.55em 1.2em;
+  border-radius: 999px;
+  font-size: clamp(0.66rem, 1.6vw, 0.78rem);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.eyebrow::before {
+  content: '';
+  width: 0.5em;
+  height: 0.5em;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 12px currentColor;
+  animation: dot-pulse 2.8s ease-in-out infinite;
+}
+
+/* light section */
+.eyebrow--light {
+  color: var(--blue);
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(52, 77, 133, 0.16);
+  box-shadow: 0 10px 22px -18px rgba(17, 27, 53, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* dark section */
+.eyebrow--dark {
+  color: var(--sky);
+  background: rgba(185, 165, 245, 0.1);
+  border: 1px solid rgba(120, 221, 245, 0.32);
+  box-shadow:
+    0 0 24px -8px rgba(120, 221, 245, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+/* Section headings ------------------------------------------- */
+.display {
+  font-family: var(--font-display);
+  font-weight: 800;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.display--dark {
+  color: var(--on-dark);
+  text-shadow: 0 12px 40px rgba(9, 14, 32, 0.75);
+}
+
+.display--light {
+  color: var(--ink);
+  text-shadow: 0 10px 30px rgba(255, 255, 255, 0.5);
+}
+
+/* The configured name, highlighted consistently everywhere ---- */
 .name-highlight {
   background: linear-gradient(
     100deg,
-    var(--pink-500) 0%,
-    var(--pink-400) 38%,
-    var(--sky-500) 100%
+    var(--sky) 0%,
+    var(--lavender) 34%,
+    var(--pink) 68%,
+    var(--cream) 100%
   );
+  background-size: 220% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
+  animation: name-shimmer 9s ease-in-out infinite;
+}
+
+/* Buttons ---------------------------------------------------- */
+.btn {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+  padding: 1.02em 2.15em;
+  border: 0;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1rem, 2.3vw, 1.1rem);
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.28s ease,
+    filter 0.28s ease;
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    115deg,
+    transparent 34%,
+    rgba(255, 255, 255, 0.55) 50%,
+    transparent 66%
+  );
+  transform: translateX(-140%);
+  animation: sheen 5.2s ease-in-out infinite;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.btn > * {
+  position: relative;
+  z-index: 2;
+}
+
+.btn:hover {
+  transform: translateY(-3px) scale(1.02);
+}
+
+.btn:active {
+  transform: translateY(0) scale(0.985);
+}
+
+.btn:focus-visible {
+  outline: 3px solid var(--sky);
+  outline-offset: 5px;
+}
+
+/* bright, glowing call to action */
+.btn--primary {
+  color: var(--navy);
+  background: linear-gradient(
+    135deg,
+    var(--sky) 0%,
+    var(--lavender) 55%,
+    var(--pink) 100%
+  );
+  background-size: 180% 180%;
+  box-shadow:
+    0 18px 40px -14px rgba(185, 165, 245, 0.85),
+    0 0 0 1px rgba(255, 255, 255, 0.35) inset,
+    0 0 34px -6px rgba(120, 221, 245, 0.55);
+  animation: btn-glow 6s ease-in-out infinite;
+}
+
+.btn--primary:hover {
+  box-shadow:
+    0 24px 48px -14px rgba(185, 165, 245, 0.95),
+    0 0 0 1px rgba(255, 255, 255, 0.45) inset,
+    0 0 46px -4px rgba(120, 221, 245, 0.75);
+}
+
+/* quiet, glassy alternative */
+.btn--ghost {
+  color: var(--on-dark);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1.5px solid rgba(185, 165, 245, 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 12px 26px -18px rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.btn--ghost:hover {
+  border-color: var(--sky);
+  color: #fff;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.24),
+    0 0 28px -6px rgba(120, 221, 245, 0.55);
+}
+
+.btn--ghost::after {
+  animation: none;
+}
+
+/* ============================================================
+   Shared animations
+   ============================================================ */
+
+@keyframes dot-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(1.6);
+  }
+}
+
+@keyframes name-shimmer {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes sheen {
+  0%,
+  62% {
+    transform: translateX(-140%);
+  }
+  100% {
+    transform: translateX(140%);
+  }
+}
+
+@keyframes btn-glow {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes gradient-pan {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes soft-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1.06);
+  }
+}
+
+/* ============================================================
+   Reduced motion — first-class, not an afterthought
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-delay: -1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    transition-delay: 0s !important;
+    scroll-behavior: auto !important;
+  }
+
+  .confetti {
+    display: none !important;
+  }
 }

@@ -1,0 +1,582 @@
+/* ============================================================
+   SCENE 4 — THE LETTER
+   Closed envelope → opening flap → cream paper letter whose lines
+   reveal in sequence. Everything fits one viewport; no scrolling.
+   ============================================================ */
+
+.scene--letter {
+  background:
+    radial-gradient(115% 85% at 50% -10%, rgba(185, 165, 245, 0.3), transparent 60%),
+    radial-gradient(95% 70% at 0% 100%, rgba(244, 184, 208, 0.2), transparent 64%),
+    radial-gradient(90% 65% at 100% 80%, rgba(120, 221, 245, 0.16), transparent 62%),
+    linear-gradient(165deg, #0d1630 0%, #16244a 55%, #101a35 100%);
+}
+
+.letter-scene {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(0.5rem, 1.4vh, 0.9rem);
+  width: min(100%, 980px);
+  height: 100%;
+  min-height: 0;
+  /* clear the floating Back button */
+  padding-top: clamp(3.1rem, 8vh, 3.7rem);
+}
+
+/* keeps the accessible name without adding visual noise */
+.letter-scene__heading {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.letter-scene__stage {
+  flex: 1 1 auto;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 0;
+}
+
+/* ============================================================
+   Envelope
+   ============================================================ */
+
+.letter-stage {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: clamp(0.7rem, 2.4vh, 1.15rem);
+  width: 100%;
+}
+
+/* soft halo behind the envelope */
+.letter-stage::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: -1;
+  width: min(92vw, 520px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -56%);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(185, 165, 245, 0.26) 0%,
+    rgba(120, 221, 245, 0.14) 42%,
+    transparent 70%
+  );
+  filter: blur(14px);
+  animation: soft-pulse 8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.envelope {
+  position: relative;
+  width: clamp(248px, 66vw, 400px);
+  aspect-ratio: 3 / 2;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  perspective: 900px;
+  animation: envelope-float 6.5s ease-in-out infinite;
+  filter: drop-shadow(0 34px 46px rgba(4, 8, 20, 0.6));
+}
+
+.envelope:focus-visible {
+  outline: 3px solid var(--sky);
+  outline-offset: 10px;
+  border-radius: 18px;
+}
+
+.envelope:hover {
+  animation-play-state: paused;
+}
+
+/* back panel so the silhouette holds while the letter peeks out */
+.envelope::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: 16px;
+  background: linear-gradient(160deg, #33497e, #1f3159);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* the cream sheet inside — hidden behind the pocket until it rises */
+.envelope__letter {
+  position: absolute;
+  left: 9%;
+  right: 9%;
+  top: 7%;
+  bottom: 11%;
+  z-index: 1;
+  border-radius: 7px;
+  background: linear-gradient(170deg, #fff8ec, #f8e7cd);
+  box-shadow: 0 8px 16px -10px rgba(9, 14, 28, 0.75);
+  transition: transform 0.62s cubic-bezier(0.22, 1, 0.36, 1) 0.08s;
+}
+
+.envelope__letter::before {
+  content: '';
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  top: 22%;
+  height: 2px;
+  border-radius: 2px;
+  background: rgba(52, 77, 133, 0.2);
+  box-shadow:
+    0 11px 0 rgba(52, 77, 133, 0.14),
+    0 22px 0 rgba(52, 77, 133, 0.1);
+}
+
+/* the envelope pocket: a solid face with soft fold shading */
+.envelope__front {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: 16px;
+  overflow: hidden;
+  background: linear-gradient(150deg, #617dc2 0%, #46619e 52%, #3a5189 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* the two side folds that meet at the centre */
+.envelope__front::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 58%);
+  clip-path: polygon(0 0, 50% 48%, 0 100%);
+}
+
+.envelope__front::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(200deg, rgba(9, 14, 28, 0.24), transparent 55%);
+  clip-path: polygon(100% 0, 50% 48%, 100% 100%);
+}
+
+/* the flap — this is the piece that swings open */
+.envelope__flap {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 3;
+  width: 100%;
+  height: 58%;
+  border-radius: 16px 16px 0 0;
+  background: linear-gradient(180deg, #7893d6 0%, #5a76bb 55%, #46619e 100%);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  transform-origin: top center;
+  transition: transform 0.66s cubic-bezier(0.45, 0.05, 0.25, 1);
+}
+
+.envelope__flap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0.22), transparent 50%);
+}
+
+/* wax-ish seal with a heart */
+.envelope__seal {
+  position: absolute;
+  left: 50%;
+  top: 53%;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  width: clamp(2rem, 9vw, 2.5rem);
+  height: clamp(2rem, 9vw, 2.5rem);
+  border-radius: 50%;
+  color: #4a2c55;
+  background: radial-gradient(circle at 34% 28%, #fff1e2, #f4b8d0 58%, #d889ad);
+  box-shadow:
+    0 10px 20px -10px rgba(9, 14, 28, 0.9),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.55);
+  transform: translate(-50%, -50%);
+  transition:
+    opacity 0.3s ease,
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.envelope__seal svg {
+  width: 55%;
+  height: 55%;
+}
+
+/* opening sequence */
+.letter-stage.is-opening .envelope {
+  animation: envelope-away 0.72s cubic-bezier(0.4, 0, 0.6, 1) 0.22s both;
+}
+
+.letter-stage.is-opening .envelope__flap {
+  transform: rotateX(-172deg);
+}
+
+.letter-stage.is-opening .envelope__letter {
+  z-index: 4;
+  transform: translateY(-54%);
+}
+
+.letter-stage.is-opening .envelope__seal {
+  opacity: 0;
+  transform: translate(-50%, -70%) scale(0.7) rotate(-14deg);
+}
+
+.letter-stage.is-opening .letter-stage__hint {
+  opacity: 0;
+}
+
+.letter-stage__hint {
+  font-family: var(--font-hand);
+  font-size: clamp(1rem, 3.2vw, 1.2rem);
+  line-height: 1.35;
+  text-align: center;
+  color: var(--pink);
+  opacity: 0.9;
+  transition: opacity 0.3s ease;
+}
+
+.envelope:hover + .letter-stage__hint {
+  opacity: 1;
+}
+
+/* ============================================================
+   The letter itself
+   ============================================================ */
+
+.letter-card {
+  position: relative;
+  width: min(100%, 620px);
+  max-height: 100%;
+  padding: clamp(1rem, 3.4vh, 1.7rem) clamp(1.1rem, 3.8vw, 2.4rem)
+    clamp(0.95rem, 3vh, 1.6rem);
+  overflow: hidden;
+  border-radius: 24px;
+  color: var(--ink);
+  background:
+    radial-gradient(120% 90% at 100% 0%, rgba(244, 184, 208, 0.3), transparent 58%),
+    radial-gradient(110% 85% at 0% 100%, rgba(120, 221, 245, 0.2), transparent 60%),
+    linear-gradient(165deg, #fff8ec 0%, #fdeeda 58%, #fbe6d0 100%);
+  box-shadow:
+    0 42px 84px -42px rgba(4, 8, 20, 0.9),
+    0 0 0 1px rgba(255, 255, 255, 0.55) inset,
+    0 0 60px -22px rgba(185, 165, 245, 0.55);
+  animation: letter-unfold 0.78s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.letter-card::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border-radius: 18px;
+  border: 1px solid rgba(52, 77, 133, 0.16);
+  pointer-events: none;
+}
+
+.letter-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(125deg, rgba(255, 255, 255, 0.35), transparent 38%);
+  pointer-events: none;
+}
+
+.letter-card__flourish {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 2.05rem;
+  height: 2.05rem;
+  margin: 0 auto 0.5rem;
+  border-radius: 50%;
+  color: #3c2b56;
+  background: linear-gradient(135deg, var(--pink), var(--lavender));
+  box-shadow: 0 10px 20px -12px rgba(185, 165, 245, 0.95);
+}
+
+.letter-card__flourish svg {
+  width: 55%;
+  height: 55%;
+}
+
+.letter-card__line {
+  position: relative;
+  z-index: 1;
+  opacity: 0;
+  animation: letter-line-in 0.72s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--d, 0s);
+}
+
+.letter-card__greeting {
+  font-family: var(--font-hand);
+  font-size: clamp(1.35rem, 3.2vh, 1.8rem);
+  font-weight: 600;
+  line-height: 1.15;
+  color: #2c3a63;
+}
+
+.letter-card__para {
+  margin-top: 0.5em;
+  font-size: clamp(0.77rem, 1.52vh, 0.94rem);
+  line-height: 1.62;
+  color: #33405f;
+  text-wrap: pretty;
+}
+
+.letter-card__sign {
+  margin-top: clamp(0.6rem, 1.8vh, 0.9rem);
+  text-align: right;
+  font-family: var(--font-hand);
+  font-size: clamp(1rem, 2.4vh, 1.2rem);
+  line-height: 1.3;
+  color: #47536f;
+}
+
+.letter-card__signature {
+  font-size: 1.15em;
+  font-weight: 700;
+  color: #2c3a63;
+}
+
+.letter-card__caret {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 2px;
+  height: 1.15em;
+  margin: 0.35rem auto 0;
+  background: var(--blue);
+  animation: caret-blink 1.05s steps(1, end) infinite;
+}
+
+/* --- Continue slot ------------------------------------------ */
+
+.letter-scene__next {
+  display: grid;
+  place-items: center;
+  min-height: clamp(3.05rem, 8vh, 3.4rem);
+  animation: letter-next-in 0.5s ease both;
+}
+
+.letter-scene__next .btn {
+  min-width: clamp(8.5rem, 30vw, 11rem);
+  min-height: 3.1rem;
+  transition:
+    opacity 0.35s ease,
+    transform 0.3s ease,
+    box-shadow 0.28s ease,
+    filter 0.35s ease;
+}
+
+.letter-scene__next:not(.is-ready) .btn {
+  opacity: 0.35;
+  filter: saturate(0.55);
+  box-shadow: none;
+  cursor: default;
+}
+
+/* ============================================================
+   Animations
+   ============================================================ */
+
+@keyframes envelope-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-0.8deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(0.8deg);
+  }
+}
+
+@keyframes envelope-away {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-14px) scale(0.9);
+  }
+}
+
+@keyframes letter-unfold {
+  from {
+    opacity: 0;
+    transform: translateY(22px) scale(0.93);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes letter-line-in {
+  from {
+    opacity: 0;
+    transform: translateY(9px);
+    filter: blur(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes letter-next-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes caret-blink {
+  0%,
+  55% {
+    opacity: 1;
+  }
+  56%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ============================================================
+   Desktop
+   ============================================================ */
+
+@media (min-width: 900px) and (min-height: 620px) {
+  .letter-scene {
+    gap: 1rem;
+    padding-top: 4rem;
+  }
+
+  .envelope {
+    width: min(27vw, 390px);
+  }
+
+  .letter-card {
+    width: min(100%, 660px);
+    padding: 2rem 2.7rem 1.8rem;
+    border-radius: 28px;
+  }
+
+  .letter-card::before {
+    inset: 10px;
+    border-radius: 20px;
+  }
+
+  .letter-card__flourish {
+    width: 2.35rem;
+    height: 2.35rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .letter-card__greeting {
+    font-size: 2rem;
+  }
+
+  .letter-card__para {
+    margin-top: 0.62em;
+    font-size: 1rem;
+    line-height: 1.66;
+  }
+
+  .letter-card__sign {
+    margin-top: 1rem;
+    font-size: 1.3rem;
+  }
+
+  .letter-scene__next .btn {
+    min-width: 11rem;
+    min-height: 3.3rem;
+    font-size: 1.05rem;
+  }
+}
+
+/* ============================================================
+   Short screens
+   ============================================================ */
+
+@media (max-height: 720px) {
+  .letter-scene {
+    padding-top: 2.8rem;
+    gap: 0.45rem;
+  }
+
+  .letter-card {
+    padding: 0.85rem 1.15rem 0.8rem;
+    border-radius: 20px;
+  }
+
+  .letter-card__flourish {
+    width: 1.6rem;
+    height: 1.6rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .letter-card__para {
+    margin-top: 0.42em;
+    line-height: 1.55;
+  }
+
+  .letter-card__sign {
+    margin-top: 0.45rem;
+  }
+
+  .envelope {
+    width: clamp(210px, 56vw, 300px);
+  }
+}
+
+/* ============================================================
+   Reduced motion
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .envelope,
+  .letter-card,
+  .letter-scene__next,
+  .letter-card__caret {
+    animation: none !important;
+  }
+
+  .letter-card__line {
+    opacity: 1;
+    animation: none !important;
+  }
+
+  .envelope__flap,
+  .envelope__letter,
+  .envelope__seal,
+  .letter-stage__hint {
+    transition: none;
+  }
+}

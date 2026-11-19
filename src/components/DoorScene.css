@@ -1,0 +1,564 @@
+/* ============================================================
+   SCENE 5 — THE ANYWHERE DOOR
+   Closed door → swing + portal light → finale card + confetti.
+   One viewport, no scrolling, safe-area aware.
+   ============================================================ */
+
+.scene--door {
+  background:
+    radial-gradient(105% 80% at 50% -8%, rgba(185, 165, 245, 0.3), transparent 60%),
+    radial-gradient(90% 70% at 0% 100%, rgba(244, 184, 208, 0.2), transparent 62%),
+    radial-gradient(95% 75% at 100% 82%, rgba(120, 221, 245, 0.2), transparent 64%),
+    linear-gradient(168deg, #0c1429 0%, #15234a 56%, #0f1931 100%);
+}
+
+.door-scene {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(0.45rem, 1.6vh, 0.9rem);
+  width: min(100%, 1020px);
+  height: 100%;
+  min-height: 0;
+  padding-top: clamp(3.1rem, 8vh, 3.9rem);
+  text-align: center;
+}
+
+.door-scene__head {
+  display: grid;
+  justify-items: center;
+  gap: clamp(0.35rem, 1.3vh, 0.7rem);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.door-scene__title {
+  max-width: 22ch;
+  font-size: clamp(1.5rem, 4.6vw, 2.55rem);
+}
+
+.door-scene__message {
+  max-width: 46ch;
+  font-size: clamp(0.82rem, 1.7vh, 1rem);
+  line-height: 1.6;
+  color: var(--on-dark-soft);
+  text-wrap: pretty;
+}
+
+.scene--door.is-open .door-scene__head {
+  position: absolute;
+  top: clamp(3.1rem, 8vh, 3.9rem);
+  left: 0;
+  right: 0;
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+}
+
+/* --- stage ------------------------------------------------- */
+
+.door-scene__stage {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  place-items: center;
+  width: 100%;
+  min-height: 0;
+}
+
+.door-scene__prop,
+.finale-card {
+  grid-area: 1 / 1;
+}
+
+.door-scene__prop {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: clamp(0.35rem, 2.2vw, 1.6rem);
+  width: 100%;
+  transition: opacity 0.6s ease, transform 0.6s ease, filter 0.6s ease;
+}
+
+.door-scene__prop.is-away {
+  opacity: 0;
+  filter: blur(5px);
+  transform: scale(1.04);
+  pointer-events: none;
+}
+
+.door-scene__mascot {
+  flex: 0 0 auto;
+  width: clamp(64px, 16vw, 172px);
+}
+
+.door-scene__mascot .doraemon {
+  filter: drop-shadow(0 20px 26px rgba(4, 8, 20, 0.55));
+}
+
+.door-portal {
+  display: grid;
+  justify-items: center;
+  gap: clamp(0.5rem, 1.4vh, 0.85rem);
+}
+
+/* --- the door ---------------------------------------------- */
+
+.anywhere-door {
+  position: relative;
+  width: clamp(156px, 40vw, 268px);
+  aspect-ratio: 1 / 2;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  perspective: 1100px;
+  -webkit-tap-highlight-color: transparent;
+  filter: drop-shadow(0 30px 44px rgba(4, 8, 20, 0.6));
+  animation: door-breathe 7s ease-in-out infinite;
+}
+
+.anywhere-door:focus-visible {
+  outline: 3px solid var(--sky);
+  outline-offset: 10px;
+  border-radius: 999px;
+}
+
+.anywhere-door:disabled {
+  cursor: default;
+}
+
+/* halo around the whole door */
+.anywhere-door__glow {
+  position: absolute;
+  inset: -24%;
+  z-index: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(185, 165, 245, 0.4) 0%,
+    rgba(120, 221, 245, 0.22) 40%,
+    transparent 70%
+  );
+  filter: blur(18px);
+  opacity: 0.75;
+  animation: soft-pulse 7s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* the doorway: this is the light behind the leaf */
+.anywhere-door__frame {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  border-radius: 999px 999px 18px 18px;
+  background:
+    radial-gradient(85% 70% at 50% 100%, #fffdf6 0%, #ffeecb 24%, #ffd9ec 52%, #c3b0f7 76%, #7f9ad8 100%);
+  box-shadow:
+    inset 0 0 0 5px rgba(255, 248, 236, 0.9),
+    inset 0 0 30px rgba(255, 255, 255, 0.85),
+    0 0 40px -6px rgba(120, 221, 245, 0.55),
+    0 0 90px -12px rgba(244, 184, 208, 0.6);
+  transition: box-shadow 0.6s ease;
+}
+
+.anywhere-door__light {
+  position: absolute;
+  inset: -45%;
+  background: repeating-conic-gradient(
+    from 0deg at 50% 64%,
+    rgba(255, 255, 255, 0.85) 0deg 5deg,
+    transparent 5deg 17deg
+  );
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: portal-rays 26s linear infinite;
+  transition: opacity 0.55s ease 0.15s;
+}
+
+/* the pink leaf that swings open */
+.anywhere-door__leaf {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: 999px 999px 18px 18px;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  backface-visibility: visible;
+  background:
+    radial-gradient(120% 60% at 30% 0%, rgba(255, 255, 255, 0.6), transparent 55%),
+    linear-gradient(150deg, #f9bfd6 0%, #ec92b6 46%, #d9739c 100%);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -10px 22px -12px rgba(110, 40, 70, 0.5),
+    inset 6px 0 20px -14px rgba(255, 255, 255, 0.8);
+  transition: transform 1.05s cubic-bezier(0.46, 0.02, 0.24, 1);
+}
+
+.anywhere-door__leaf::before {
+  content: '';
+  position: absolute;
+  inset: 9% 12% 7%;
+  border-radius: 999px 999px 12px 12px;
+  border: 2px solid rgba(255, 255, 255, 0.42);
+  box-shadow:
+    0 0 0 1px rgba(150, 55, 90, 0.22),
+    inset 0 0 26px rgba(255, 255, 255, 0.2);
+}
+
+.anywhere-door__sign {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  padding: 0.3em 0.72em;
+  border-radius: 8px;
+  font-family: var(--font-display);
+  font-size: clamp(0.55rem, 1.5vw, 0.78rem);
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  color: #4b2a44;
+  background: linear-gradient(180deg, #fff8ec, #ffe6cf);
+  box-shadow:
+    0 6px 14px -8px rgba(9, 14, 28, 0.8),
+    inset 0 0 0 1px rgba(170, 110, 110, 0.35);
+  transform: translateX(-50%);
+}
+
+.anywhere-door__knob {
+  position: absolute;
+  right: 9%;
+  top: 58%;
+  width: clamp(10px, 2.6vw, 16px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 28%, #fff6d6, #ffd984 55%, #d9a53f);
+  box-shadow: 0 4px 10px -4px rgba(80, 50, 10, 0.8);
+}
+
+/* opening state — classes persist once the door is swung */
+.anywhere-door.is-opening .anywhere-door__leaf {
+  transform: rotateY(-112deg);
+}
+
+.anywhere-door.is-opening .anywhere-door__light {
+  opacity: 1;
+}
+
+.anywhere-door.is-opening .anywhere-door__frame {
+  box-shadow:
+    inset 0 0 0 5px rgba(255, 248, 236, 0.95),
+    inset 0 0 40px rgba(255, 255, 255, 1),
+    0 0 60px -2px rgba(120, 221, 245, 0.8),
+    0 0 130px -6px rgba(244, 184, 208, 0.9);
+}
+
+.door-scene__hint {
+  font-family: var(--font-hand);
+  font-size: clamp(1rem, 3.2vw, 1.2rem);
+  line-height: 1.35;
+  color: var(--pink);
+  transition: opacity 0.3s ease;
+}
+
+.anywhere-door:hover + .door-scene__hint {
+  opacity: 1;
+}
+
+.door-portal .anywhere-door.is-opening ~ .door-scene__hint {
+  opacity: 0;
+}
+
+/* ============================================================
+   Finale card
+   ============================================================ */
+
+.finale-card {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  justify-items: center;
+  gap: clamp(0.45rem, 1.5vh, 0.85rem);
+  width: min(100%, 600px);
+  max-height: 100%;
+  padding: clamp(1.3rem, 4vw, 2.4rem) clamp(1.15rem, 4vw, 2.4rem)
+    clamp(1.2rem, 3.6vw, 2.2rem);
+  overflow: hidden;
+  border-radius: 28px;
+  text-align: center;
+  background:
+    radial-gradient(120% 100% at 50% 0%, rgba(185, 165, 245, 0.34), transparent 62%),
+    radial-gradient(110% 90% at 50% 115%, rgba(120, 221, 245, 0.24), transparent 60%),
+    linear-gradient(160deg, rgba(40, 58, 110, 0.9), rgba(14, 23, 48, 0.94));
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow:
+    0 44px 90px -46px rgba(0, 0, 0, 0.95),
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset,
+    0 0 80px -26px rgba(185, 165, 245, 0.8);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  animation: finale-in 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
+  outline: none;
+}
+
+/* aura behind the card, as if the doorway light fills the stage */
+.finale-card::before {
+  content: '';
+  position: absolute;
+  inset: -30%;
+  z-index: -1;
+  background: radial-gradient(
+    circle,
+    rgba(185, 165, 245, 0.4) 0%,
+    rgba(244, 184, 208, 0.2) 38%,
+    transparent 70%
+  );
+  filter: blur(20px);
+  animation: soft-pulse 7s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.finale-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(125deg, rgba(255, 255, 255, 0.14), transparent 40%);
+  pointer-events: none;
+}
+
+.finale-card__spark {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 2.3rem;
+  height: 2.3rem;
+  margin-bottom: 0.15rem;
+  border-radius: 50%;
+  color: #3c2b56;
+  background: linear-gradient(135deg, var(--sky), var(--lavender) 60%, var(--pink));
+  box-shadow: 0 12px 24px -12px rgba(185, 165, 245, 0.95);
+  animation: spark-turn 9s ease-in-out infinite;
+}
+
+.finale-card__spark svg {
+  width: 58%;
+  height: 58%;
+}
+
+.finale-card__title {
+  position: relative;
+  z-index: 1;
+  max-width: 24ch;
+  font-size: clamp(1.4rem, 4.4vw, 2.4rem);
+  line-height: 1.1;
+}
+
+.finale-card__body {
+  position: relative;
+  z-index: 1;
+  max-width: 42ch;
+  font-size: clamp(0.84rem, 1.8vh, 0.98rem);
+  line-height: 1.65;
+  color: var(--on-dark-soft);
+  text-wrap: pretty;
+}
+
+.finale-card__signature {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-hand);
+  font-size: clamp(1.1rem, 2.8vh, 1.4rem);
+  font-weight: 700;
+  color: var(--pink);
+}
+
+.finale-card__replay {
+  position: relative;
+  z-index: 1;
+  margin-top: clamp(0.25rem, 1.4vh, 0.7rem);
+  min-height: 3.1rem;
+  padding: 0.92em 1.8em;
+  font-size: clamp(0.92rem, 2.6vw, 1.02rem);
+}
+
+.finale-card__replay svg {
+  width: 1.15em;
+  height: 1.15em;
+}
+
+/* ============================================================
+   Animations
+   ============================================================ */
+
+@keyframes door-breathe {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-0.4deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(0.4deg);
+  }
+}
+
+@keyframes portal-rays {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes finale-in {
+  from {
+    opacity: 0;
+    transform: translateY(26px) scale(0.9);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes spark-turn {
+  0%,
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(14deg) scale(1.08);
+  }
+}
+
+/* ============================================================
+   Desktop
+   ============================================================ */
+
+@media (min-width: 900px) and (min-height: 620px) {
+  .door-scene {
+    gap: 1rem;
+    padding-top: 4rem;
+  }
+
+  .anywhere-door {
+    width: 268px;
+  }
+
+  .door-scene__title {
+    font-size: clamp(1.9rem, 2.9vw, 2.9rem);
+  }
+
+  .door-scene__message {
+    font-size: 1rem;
+  }
+
+  .finale-card {
+    width: min(100%, 660px);
+    padding: 2.5rem 2.9rem 2.4rem;
+    border-radius: 32px;
+  }
+
+  .finale-card__spark {
+    width: 2.6rem;
+    height: 2.6rem;
+  }
+
+  .finale-card__title {
+    font-size: clamp(2rem, 2.9vw, 2.6rem);
+  }
+
+  .finale-card__body {
+    font-size: 1.02rem;
+  }
+
+  .finale-card__signature {
+    font-size: 1.5rem;
+  }
+
+  .finale-card__replay {
+    min-height: 3.4rem;
+    font-size: 1.05rem;
+  }
+}
+
+/* ============================================================
+   Short screens
+   ============================================================ */
+
+@media (max-height: 720px) {
+  .door-scene {
+    gap: 0.4rem;
+    padding-top: 2.8rem;
+  }
+
+  .door-scene__title {
+    font-size: clamp(1.3rem, 4vw, 1.9rem);
+  }
+
+  .door-scene__message {
+    font-size: 0.78rem;
+    line-height: 1.45;
+  }
+
+  .anywhere-door {
+    width: clamp(136px, 30vw, 210px);
+  }
+
+  .door-scene__mascot {
+    width: clamp(56px, 13vw, 130px);
+  }
+
+  .finale-card {
+    padding: 0.95rem 1.15rem 0.9rem;
+    border-radius: 22px;
+    gap: 0.35rem;
+  }
+
+  .finale-card__spark {
+    width: 1.7rem;
+    height: 1.7rem;
+  }
+
+  .finale-card__title {
+    font-size: clamp(1.2rem, 3.4vh, 1.8rem);
+  }
+
+  .finale-card__body {
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+
+  .finale-card__replay {
+    min-height: 2.8rem;
+  }
+}
+
+/* ============================================================
+   Reduced motion
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .anywhere-door,
+  .anywhere-door__glow,
+  .anywhere-door__light,
+  .finale-card,
+  .finale-card::before,
+  .finale-card__spark {
+    animation: none !important;
+  }
+
+  .anywhere-door__leaf,
+  .anywhere-door__frame,
+  .door-scene__head,
+  .door-scene__prop,
+  .door-scene__hint {
+    transition: none !important;
+  }
+}

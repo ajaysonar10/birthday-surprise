@@ -1,339 +1,197 @@
 /* ============================================================
-   Birthday Surprise — welcome screen
+   SCENE SHELL — one full-screen scene at a time, no page scroll
    ============================================================ */
 
-/* ----------------------------- animations ----------------------------- */
-
-@keyframes card-rise {
-  from {
-    opacity: 0;
-    transform: translateY(28px) scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-@keyframes bob {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-9px);
-  }
-}
-
-@keyframes wave {
-  0%,
-  100% {
-    transform: rotate(-8deg);
-  }
-  50% {
-    transform: rotate(15deg);
-  }
-}
-
-@keyframes bell-swing {
-  0%,
-  100% {
-    transform: rotate(-5deg);
-  }
-  50% {
-    transform: rotate(6deg);
-  }
-}
-
-@keyframes drift {
-  0%,
-  100% {
-    transform: translate3d(-7%, 0, 0);
-  }
-  50% {
-    transform: translate3d(7%, -6px, 0);
-  }
-}
-
-@keyframes balloon-float {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0) rotate(-3deg);
-  }
-  50% {
-    transform: translate3d(8px, -24px, 0) rotate(4deg);
-  }
-}
-
-@keyframes twinkle {
-  0%,
-  100% {
-    opacity: 0.15;
-    transform: scale(0.75) rotate(0deg);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.15) rotate(20deg);
-  }
-}
-
-@keyframes sheen {
-  0%,
-  58% {
-    transform: translateX(-130%);
-  }
-  100% {
-    transform: translateX(130%);
-  }
-}
-
-@keyframes eyebrow-dot {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 0.95;
-  }
-  50% {
-    transform: scale(1.55);
-    opacity: 0.45;
-  }
-}
-
-@keyframes confetti-fall {
-  0% {
-    opacity: 0;
-    transform: translate3d(0, -12vh, 0) rotate(0deg);
-  }
-  8% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: translate3d(var(--drift, 20px), 106vh, 0)
-      rotate(calc(var(--rot, 180deg) + 360deg));
-  }
-}
-
-/* ------------------------------- layout ------------------------------- */
-
-.welcome {
-  position: relative;
-  isolation: isolate;
-  flex: 1;
-  min-height: 100svh;
-  display: grid;
-  place-items: center;
-  padding: clamp(20px, 4vw, 56px) clamp(16px, 4vw, 40px);
+.app {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
-  background:
-    radial-gradient(120% 90% at 12% 0%, #eaf9ff 0%, rgba(234, 249, 255, 0) 58%),
-    radial-gradient(110% 85% at 92% 6%, #ffeaf4 0%, rgba(255, 234, 244, 0) 62%),
-    radial-gradient(100% 80% at 50% 108%, #ffe4f0 0%, rgba(255, 228, 240, 0) 60%),
-    linear-gradient(180deg, #e7f6ff 0%, #f6fbff 50%, #ffeef7 100%);
+  overscroll-behavior: none;
+  background: var(--navy);
+  isolation: isolate;
 }
 
-/* tiny polka-dot texture, faded toward the edges */
-.welcome::before {
-  content: '';
+.app__scene {
   position: absolute;
   inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background-image: radial-gradient(rgba(124, 201, 240, 0.25) 1.4px, transparent 1.4px);
-  background-size: 26px 26px;
-  -webkit-mask-image: radial-gradient(85% 65% at 50% 42%, #000 15%, transparent 78%);
-  mask-image: radial-gradient(85% 65% at 50% 42%, #000 15%, transparent 78%);
+  overflow: hidden;
 }
 
-/* ------------------------------- the card ------------------------------ */
+.app__scene--forward {
+  animation: scene-in-forward 0.62s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
 
-.welcome__card {
+.app__scene--back {
+  animation: scene-in-back 0.62s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Base scene: fills the shell, respects mobile safe areas, and
+   never lets its content push past the viewport. */
+.scene {
   position: relative;
-  z-index: 2;
-  width: min(720px, 100%);
-  padding: clamp(26px, 5vw, 54px) clamp(20px, 4.5vw, 56px)
-    clamp(24px, 4vw, 46px);
-  border-radius: clamp(26px, 5vw, 44px);
-  background: linear-gradient(
-    165deg,
-    rgba(255, 255, 255, 0.94) 0%,
-    rgba(255, 255, 255, 0.78) 55%,
-    rgba(255, 255, 255, 0.86) 100%
-  );
-  border: 1.5px solid rgba(255, 255, 255, 0.95);
-  box-shadow:
-    0 44px 80px -44px rgba(64, 150, 205, 0.6),
-    0 14px 34px -20px rgba(255, 143, 184, 0.6),
-    inset 0 1px 0 #ffffff;
-  backdrop-filter: blur(16px) saturate(125%);
-  -webkit-backdrop-filter: blur(16px) saturate(125%);
-  text-align: center;
-  animation: card-rise 0.95s cubic-bezier(0.22, 1, 0.36, 1) both;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  padding:
+    max(0.9rem, env(safe-area-inset-top))
+    max(0.9rem, env(safe-area-inset-right))
+    max(0.9rem, env(safe-area-inset-bottom))
+    max(0.9rem, env(safe-area-inset-left));
 }
 
-/* dashed inner frame */
-.welcome__card::before {
-  content: '';
+/* --- Back button -------------------------------------------- */
+
+.scene-back {
   position: absolute;
-  inset: clamp(8px, 1.5vw, 13px);
-  border: 1.5px dashed rgba(124, 201, 240, 0.45);
-  border-radius: clamp(19px, 4vw, 33px);
-  pointer-events: none;
-}
-
-.welcome__eyebrow {
-  position: relative;
+  z-index: 30;
+  top: max(0.8rem, env(safe-area-inset-top));
+  left: max(0.8rem, env(safe-area-inset-left));
   display: inline-flex;
   align-items: center;
-  gap: 0.6em;
-  margin-bottom: clamp(14px, 2.6vw, 22px);
-  padding: 0.52em 1.15em;
+  gap: 0.35em;
+  min-height: 3rem;
+  padding: 0.55em 1.15em 0.55em 0.85em;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(124, 201, 240, 0.45);
-  color: #3f7fa5;
-  font-size: clamp(0.68rem, 1.7vw, 0.78rem);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
   font-weight: 700;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  box-shadow: 0 8px 18px -14px rgba(64, 150, 205, 0.8);
+  color: var(--on-dark);
+  background: rgba(17, 27, 53, 0.55);
+  border: 1.5px solid rgba(185, 165, 245, 0.45);
+  box-shadow: 0 12px 26px -18px rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.25s ease,
+    background 0.25s ease;
 }
 
-.welcome__eyebrow-dot {
-  width: 0.55em;
-  height: 0.55em;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--pink-400), var(--gold-400));
-  box-shadow: 0 0 0 4px rgba(255, 143, 184, 0.16);
-  animation: eyebrow-dot 2.6s ease-in-out infinite;
+.scene-back svg {
+  width: 1.15em;
+  height: 1.15em;
 }
 
-.welcome__mascot {
-  width: clamp(142px, 24vw, 196px);
-  margin: 0 auto clamp(10px, 2vw, 16px);
-  filter: drop-shadow(0 22px 24px rgba(64, 150, 205, 0.24));
-  animation: bob 5.2s ease-in-out infinite;
+.scene-back:hover {
+  border-color: var(--sky);
+  background: rgba(30, 47, 92, 0.7);
+  transform: translateX(-2px);
 }
+
+.scene-back:focus-visible {
+  outline: 3px solid var(--sky);
+  outline-offset: 4px;
+}
+
+/* ============================================================
+   Doraemon — idle float, blink, wave, and mood reactions
+   ============================================================ */
 
 .doraemon {
   width: 100%;
   height: auto;
   overflow: visible;
+  filter: drop-shadow(0 26px 34px rgba(6, 10, 24, 0.55));
+  animation: doraemon-float 7s ease-in-out infinite;
 }
 
 .doraemon__hand {
-  transform-box: fill-box;
-  transform-origin: 12% 88%;
-  animation: wave 2.9s ease-in-out infinite;
+  transform-box: view-box;
+  transform-origin: 204px 168px;
+  animation: doraemon-wave 3.6s ease-in-out infinite;
 }
 
 .doraemon__bell {
+  transform-box: view-box;
+  transform-origin: 115px 198px;
+  animation: doraemon-bell 4.4s ease-in-out infinite;
+}
+
+.doraemon__eyes {
   transform-box: fill-box;
-  transform-origin: 50% 0%;
-  animation: bell-swing 3.4s ease-in-out infinite;
+  transform-origin: center;
+  animation: doraemon-blink 5.8s ease-in-out infinite;
 }
 
-.welcome__title {
-  position: relative;
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: clamp(1.85rem, 6vw, 3.4rem);
-  line-height: 1.06;
-  letter-spacing: -0.02em;
-  color: var(--ink);
-  white-space: pre-line;
-  text-wrap: balance;
+.doraemon__mouth {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-.welcome__tagline {
-  max-width: 44ch;
-  margin: clamp(12px, 2.4vw, 18px) auto 0;
-  color: var(--muted);
-  font-size: clamp(0.97rem, 2.4vw, 1.08rem);
-  line-height: 1.65;
-  text-wrap: pretty;
+.doraemon__reaction {
+  opacity: 0;
+  transition: opacity 0.35s ease;
 }
 
-/* ------------------------------- the button ---------------------------- */
-
-.welcome__cta {
-  position: relative;
-  overflow: hidden;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6em;
-  margin-top: clamp(24px, 4vw, 34px);
-  padding: 1.02em 2.1em;
-  border: 0;
-  border-radius: 999px;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: clamp(1rem, 2.3vw, 1.12rem);
-  letter-spacing: 0.01em;
-  color: #ffffff;
-  cursor: pointer;
-  background: linear-gradient(135deg, #ff9dc5 0%, #ffb0d0 42%, #7cc9f0 100%);
-  box-shadow:
-    0 20px 34px -14px rgba(255, 143, 184, 0.85),
-    0 10px 22px -12px rgba(64, 150, 205, 0.7),
-    inset 0 1px 0 rgba(255, 255, 255, 0.65);
-  transition:
-    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.25s ease;
-  -webkit-tap-highlight-color: transparent;
+.doraemon__reaction-heart,
+.doraemon__reaction-spark {
+  transform-box: fill-box;
+  transform-origin: center;
 }
 
-.welcome__cta::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    115deg,
-    transparent 32%,
-    rgba(255, 255, 255, 0.7) 50%,
-    transparent 68%
-  );
-  transform: translateX(-130%);
-  animation: sheen 4.6s ease-in-out infinite;
-  pointer-events: none;
+.doraemon--happy {
+  animation: doraemon-happy 1.05s ease-in-out 2;
 }
 
-.welcome__cta:hover {
-  transform: translateY(-3px) scale(1.02);
-  box-shadow:
-    0 26px 40px -14px rgba(255, 143, 184, 0.9),
-    0 14px 26px -12px rgba(64, 150, 205, 0.75),
-    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+.doraemon--happy .doraemon__hand {
+  animation-duration: 1.1s;
 }
 
-.welcome__cta:active {
-  transform: translateY(0) scale(0.99);
+.doraemon--happy .doraemon__reaction {
+  opacity: 1;
 }
 
-.welcome__cta:focus-visible {
-  outline: 3px solid var(--sky-500);
-  outline-offset: 4px;
+.doraemon--happy .doraemon__reaction-heart {
+  animation: reaction-pop 1.6s ease-in-out infinite;
 }
 
-.welcome__cta-icon {
-  width: 1.15em;
-  height: 1.15em;
-  color: #ffffff;
-  transition: transform 0.35s ease;
+.doraemon--happy .doraemon__reaction-heart:nth-of-type(2) {
+  animation-delay: 0.18s;
 }
 
-.welcome__cta:hover .welcome__cta-icon {
-  transform: rotate(90deg) scale(1.1);
+.doraemon--happy .doraemon__reaction-heart:nth-of-type(3) {
+  animation-delay: 0.36s;
 }
 
-.welcome__hint {
-  margin-top: 0.95em;
-  color: #93a1bb;
-  font-size: clamp(0.78rem, 1.9vw, 0.85rem);
-  letter-spacing: 0.03em;
+.doraemon--happy .doraemon__reaction-spark {
+  animation: reaction-pop 1.3s ease-in-out infinite;
 }
 
-/* ------------------------------ decorations ---------------------------- */
+.doraemon--shy {
+  animation: doraemon-shy 1.5s ease-in-out both;
+}
+
+.doraemon--shy .doraemon__blush {
+  opacity: 0.8;
+}
+
+.doraemon--sad {
+  animation: doraemon-droop 1.3s ease-in-out both;
+}
+
+.doraemon--sad .doraemon__blush {
+  opacity: 0.12;
+}
+
+.doraemon--sad .doraemon__mouth {
+  transform: translateY(4px) scale(0.84);
+}
+
+.doraemon--sad .doraemon__eyes {
+  transform: translateY(2px) scaleY(0.82);
+}
+
+/* ============================================================
+   Floating decorations
+   ============================================================ */
 
 .decorations {
   position: absolute;
@@ -343,155 +201,407 @@
   pointer-events: none;
 }
 
-.cloud {
+.deco-orb {
   position: absolute;
-  width: var(--w, 160px);
-  height: calc(var(--w, 160px) * 0.32);
-  border-radius: 999px;
-  background: #ffffff;
-  opacity: var(--o, 0.8);
-  box-shadow: 0 16px 28px -20px rgba(64, 150, 205, 0.65);
-  animation: drift var(--dur, 40s) ease-in-out infinite;
-  animation-delay: var(--delay, 0s);
-}
-
-.cloud::before,
-.cloud::after {
-  content: '';
-  position: absolute;
+  width: var(--size);
+  height: var(--size);
   border-radius: 50%;
-  background: #ffffff;
+  opacity: 0.5;
+  filter: blur(46px);
+  animation: orb-drift var(--dur) ease-in-out infinite alternate;
+  animation-delay: var(--delay);
 }
 
-.cloud::before {
-  width: 46%;
-  aspect-ratio: 1;
-  top: -46%;
-  left: 13%;
+.deco-orb--lavender {
+  background: radial-gradient(circle, rgba(185, 165, 245, 0.75), transparent 68%);
 }
 
-.cloud::after {
-  width: 33%;
-  aspect-ratio: 1;
-  top: -30%;
-  left: 56%;
+.deco-orb--sky {
+  background: radial-gradient(circle, rgba(120, 221, 245, 0.62), transparent 68%);
 }
 
-.balloon {
+.deco-orb--pink {
+  background: radial-gradient(circle, rgba(244, 184, 208, 0.6), transparent 68%);
+}
+
+.deco-heart,
+.deco-star {
   position: absolute;
-  width: var(--bw, 52px);
-  aspect-ratio: 1 / 1.22;
-  border-radius: 50% 50% 46% 46% / 54% 54% 46% 46%;
-  background:
-    radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.85), transparent 42%),
-    var(--c, #ffb3d1);
-  box-shadow: 0 14px 22px -16px rgba(64, 150, 205, 0.6);
-  animation: balloon-float var(--dur, 14s) ease-in-out infinite;
-  animation-delay: var(--delay, 0s);
-}
-
-.balloon::before {
-  content: '';
-  position: absolute;
-  bottom: -5px;
-  left: 50%;
-  transform: translateX(-50%);
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-bottom: 7px solid var(--c, #ffb3d1);
-}
-
-.balloon::after {
-  content: '';
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  width: 1.5px;
-  height: var(--str, 70px);
-  background: linear-gradient(
-    180deg,
-    rgba(88, 120, 150, 0.45),
-    rgba(88, 120, 150, 0)
-  );
-}
-
-.sparkle {
-  position: absolute;
-  font-size: var(--s, 16px);
   line-height: 1;
-  color: #ffffff;
-  text-shadow: 0 0 14px rgba(255, 255, 255, 0.95);
-  animation: twinkle var(--dur, 3.6s) ease-in-out infinite;
-  animation-delay: var(--delay, 0s);
+  user-select: none;
 }
 
-/* ------------------------------- confetti ------------------------------ */
+.deco-heart {
+  font-size: var(--s);
+  animation: heart-drift var(--dur) ease-in-out infinite;
+  animation-delay: var(--delay);
+}
+
+.deco-star {
+  font-size: var(--s);
+  animation: star-twinkle var(--dur) ease-in-out infinite;
+  animation-delay: var(--delay);
+}
+
+.deco-sparkle {
+  position: absolute;
+  width: var(--s);
+  height: var(--s);
+  border-radius: 50%;
+  background: #fff8e9;
+  box-shadow: 0 0 10px 2px rgba(255, 240, 216, 0.8);
+  animation: sparkle-twinkle var(--dur) ease-in-out infinite;
+  animation-delay: var(--delay);
+}
+
+/* dark scenes: luminous pastel pieces */
+.decorations--dark .deco-heart--pink {
+  color: var(--pink);
+  text-shadow: 0 0 16px rgba(244, 184, 208, 0.75);
+}
+
+.decorations--dark .deco-heart--lavender {
+  color: var(--lavender);
+  text-shadow: 0 0 16px rgba(185, 165, 245, 0.8);
+}
+
+.decorations--dark .deco-heart--cream {
+  color: var(--cream);
+  text-shadow: 0 0 14px rgba(255, 240, 216, 0.7);
+}
+
+.decorations--dark .deco-star--cream {
+  color: var(--cream);
+  text-shadow: 0 0 12px rgba(255, 240, 216, 0.85);
+}
+
+.decorations--dark .deco-star--sky {
+  color: var(--sky);
+  text-shadow: 0 0 12px rgba(120, 221, 245, 0.85);
+}
+
+.decorations--dark .deco-star--lavender {
+  color: var(--lavender);
+  text-shadow: 0 0 12px rgba(185, 165, 245, 0.8);
+}
+
+/* light scenes: deeper, softer pieces */
+.decorations--light .deco-heart {
+  opacity: 0.5;
+}
+
+.decorations--light .deco-heart--pink {
+  color: #e888ac;
+}
+
+.decorations--light .deco-heart--lavender {
+  color: #8b74dd;
+}
+
+.decorations--light .deco-heart--cream {
+  color: #e0b48a;
+}
+
+.decorations--light .deco-star--cream {
+  color: #e8c07f;
+}
+
+.decorations--light .deco-star--sky {
+  color: #4aa9c9;
+}
+
+.decorations--light .deco-star--lavender {
+  color: #8b74dd;
+}
+
+.decorations--light .deco-sparkle {
+  background: #ffffff;
+  box-shadow: 0 0 10px 2px rgba(185, 165, 245, 0.6);
+}
+
+.decorations--light .deco-orb {
+  opacity: 0.35;
+  filter: blur(52px);
+}
+
+/* ============================================================
+   Confetti
+   ============================================================ */
 
 .confetti {
   position: fixed;
   inset: 0;
-  z-index: 6;
+  z-index: 80;
   overflow: hidden;
   pointer-events: none;
 }
 
 .confetti__piece {
   position: absolute;
-  top: -6vh;
-  width: 9px;
-  height: 14px;
-  border-radius: 3px;
+  top: -12vh;
+  width: var(--size);
+  height: calc(var(--size) * 1.6);
+  border-radius: 2px;
+  opacity: 0;
   animation-name: confetti-fall;
   animation-timing-function: linear;
   animation-fill-mode: forwards;
 }
 
 .confetti__piece--round {
-  width: 9px;
-  height: 9px;
+  height: var(--size);
   border-radius: 50%;
 }
 
-/* ------------------------------ responsive ----------------------------- */
+.confetti__piece--heart {
+  width: auto;
+  height: auto;
+  background: none !important;
+  font-size: calc(var(--size) * 1.6);
+  line-height: 1;
+  filter: drop-shadow(0 0 8px rgba(244, 184, 208, 0.45));
+}
 
-@media (max-width: 620px) {
-  .deco--hide-sm {
+/* ============================================================
+   Keyframes
+   ============================================================ */
+
+@keyframes scene-in-forward {
+  from {
+    opacity: 0;
+    transform: translate3d(7%, 0, 0) scale(0.96);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes scene-in-back {
+  from {
+    opacity: 0;
+    transform: translate3d(-7%, 0, 0) scale(0.96);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes doraemon-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(-1deg);
+  }
+}
+
+@keyframes doraemon-wave {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(-16deg);
+  }
+  45% {
+    transform: rotate(10deg);
+  }
+  70% {
+    transform: rotate(-8deg);
+  }
+}
+
+@keyframes doraemon-bell {
+  0%,
+  88%,
+  100% {
+    transform: rotate(0deg);
+  }
+  92% {
+    transform: rotate(-7deg);
+  }
+  96% {
+    transform: rotate(6deg);
+  }
+}
+
+@keyframes doraemon-blink {
+  0%,
+  42%,
+  48%,
+  100% {
+    transform: scaleY(1);
+  }
+  45% {
+    transform: scaleY(0.08);
+  }
+}
+
+@keyframes doraemon-happy {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  35% {
+    transform: translateY(-20px) scale(1.03);
+  }
+  65% {
+    transform: translateY(-6px) scale(1.01);
+  }
+}
+
+@keyframes doraemon-shy {
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+  35% {
+    transform: rotate(-5deg) translateY(4px);
+  }
+  70% {
+    transform: rotate(-3deg) translateY(2px);
+  }
+}
+
+@keyframes doraemon-droop {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  40% {
+    transform: translateY(8px) rotate(2deg) scale(0.985);
+  }
+}
+
+@keyframes reaction-pop {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(4px) scale(0.85);
+  }
+  45% {
+    opacity: 1;
+    transform: translateY(-8px) scale(1.12);
+  }
+}
+
+@keyframes orb-drift {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(38px, -52px, 0) scale(1.14);
+  }
+}
+
+@keyframes heart-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(-8deg);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translate3d(10px, -34px, 0) rotate(8deg);
+    opacity: 1;
+  }
+}
+
+@keyframes star-twinkle {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.65) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15) rotate(20deg);
+  }
+}
+
+@keyframes sparkle-twinkle {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.25);
+  }
+}
+
+@keyframes confetti-fall {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -10vh, 0) rotate(0deg);
+  }
+  10% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--drift), 112vh, 0) rotate(var(--rot));
+  }
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+
+/* Back scales up gently on large screens */
+@media (min-width: 900px) and (min-height: 620px) {
+  .scene-back {
+    min-height: 3.2rem;
+    font-size: 1rem;
+  }
+}
+
+/* keep the busiest corners calmer on small screens */
+@media (max-width: 900px) {
+  .deco-heart:nth-child(n + 7),
+  .deco-star:nth-child(n + 7),
+  .deco-sparkle:nth-child(n + 9) {
     display: none;
   }
-
-  .welcome__card::before {
-    border-style: dashed;
-    border-width: 1px;
-  }
 }
 
-@media (max-width: 380px) {
-  .welcome__eyebrow {
-    letter-spacing: 0.1em;
-  }
-}
-
-/* -------------------------- reduced motion ----------------------------- */
+/* ============================================================
+   Reduced motion
+   ============================================================ */
 
 @media (prefers-reduced-motion: reduce) {
-  .welcome__card,
-  .welcome__mascot,
-  .doraemon__hand,
-  .doraemon__bell,
-  .cloud,
-  .balloon,
-  .sparkle,
-  .welcome__eyebrow-dot,
-  .welcome__cta::after {
+  .app__scene {
     animation: none !important;
   }
 
-  .confetti {
-    display: none;
+  .doraemon,
+  .doraemon__hand,
+  .doraemon__bell,
+  .doraemon__eyes,
+  .doraemon__reaction-heart,
+  .doraemon__reaction-spark,
+  .deco-orb,
+  .deco-heart,
+  .deco-star,
+  .deco-sparkle {
+    animation: none !important;
   }
 
-  .welcome__cta,
-  .welcome__cta-icon {
+  .doraemon__reaction {
+    opacity: 0;
+  }
+
+  .scene-back {
     transition: none;
   }
 }

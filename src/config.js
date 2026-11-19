@@ -1,13 +1,19 @@
 /**
  * ============================================================
- *  BIRTHDAY SURPRISE — CENTRAL CONFIGURATION
+ *  SIBLING SURPRISE — CENTRAL CONFIGURATION
  * ============================================================
- *  This is the only file you need to edit to personalise the site.
- *  Change `person.name` and every screen, headline, letter and
- *  message updates automatically.
+ *  This is the only file you need to edit to personalise the
+ *  experience. Change `person.name` and every scene updates.
  *
- *  Any text below may contain the token {name} — it is replaced
- *  with `person.name` wherever it appears.
+ *  Any text may contain the token {name} — it is replaced with
+ *  `person.name` wherever it appears.
+ *
+ *  Scenes (one at a time, never stacked):
+ *    1. The first question
+ *    2. The second question
+ *    3. Photo upload + memory gallery
+ *    4. The sibling love letter
+ *    5. The Doraemon-inspired Anywhere Door
  * ============================================================
  */
 
@@ -16,61 +22,110 @@ export const config = {
    *  WHO IS THIS FOR?
    * ---------------------------------------------------------- */
   person: {
-    name: 'Your Special Person',
+    name: 'Little Sis',
   },
 
   /* ----------------------------------------------------------
-   *  WELCOME SCREEN
+   *  BROWSER TAB
    * ---------------------------------------------------------- */
-  welcome: {
-    eyebrow: 'A little something for you',
-    button: 'Open Your Surprise',
-    hint: 'Psst… tap the button ✨',
+  site: {
+    title: 'Something special for {name} ✨',
+    description:
+      'Five little scenes made by your sibling — a question, a few memories, a letter and one door.',
   },
 
   /* ----------------------------------------------------------
-   *  BIRTHDAY HEADLINE & MESSAGE
+   *  SCENE 1 — THE FIRST QUESTION
+   *  `bubble` is the tiny line Doraemon says above his head.
    * ---------------------------------------------------------- */
-  birthday: {
-    headline: 'Happy Birthday,\n{name}!',
-    tagline:
-      'Today the whole sky is dressed up just for you — balloons, bells and all.',
+  sceneOne: {
+    eyebrow: 'Five little scenes · just for you',
+    bubble: 'Okay. Deep breath. She is here.',
+    lead: "I've made something special for you.",
+    question: 'Do you wanna see it?',
+    yesLabel: 'YES',
+    noLabel: 'NO',
+    hint: 'No scrollbars. No rush. Just us.',
+    replies: [
+      'That button is feeling shy. Give it another go?',
+      'Hmm. Try again — I promise it is worth it.',
+      'The NO button keeps running away. Very suspicious.',
+      'I can wait. I am extremely patient. (Mostly.)',
+      'Nice try. The YES button has been waiting all day.',
+    ],
   },
 
   /* ----------------------------------------------------------
-   *  PERSONAL LETTER
-   *  Each string in `paragraphs` becomes its own paragraph.
+   *  SCENE 2 — THE SECOND QUESTION
+   * ---------------------------------------------------------- */
+  sceneTwo: {
+    eyebrow: 'One tiny check',
+    bubble: 'Wait. Are you absolutely sure?',
+    lead: 'Do you REALLY wanna see it?',
+    yesLabel: 'YES',
+    noLabel: 'NO',
+    hint: 'There is no going back after this. (There is. But still.)',
+    replies: [
+      'Bold. Incorrect, but bold.',
+      'You are really committing to this bit, huh?',
+      'I can do this all day. I have snacks.',
+      'The YES button is getting nervous. Be gentle.',
+      'You know you want to. I can see it in your face.',
+    ],
+  },
+
+  /* ----------------------------------------------------------
+   *  SCENE 3 — PHOTO UPLOAD & MEMORY GALLERY
+   * ---------------------------------------------------------- */
+  gallery: {
+    eyebrow: 'The shoebox',
+    title: 'A Little Collection of Our Memories',
+    subtitle: 'Add a few photos — they never leave your device.',
+    addLabel: 'Add photos',
+    continueLabel: 'Continue',
+    emptyTitle: 'Tap to add the first memory',
+    emptyHint: 'Or drop photos here. Everything stays on this device.',
+    prevLabel: 'Previous photo',
+    nextLabel: 'Next photo',
+    counterLabel: 'Memory',
+  },
+
+  /* ----------------------------------------------------------
+   *  SCENE 4 — THE LETTER
    * ---------------------------------------------------------- */
   letter: {
-    eyebrow: 'Sealed with love',
+    eyebrow: 'Something I have been meaning to say',
     title: 'A letter for {name}',
-    envelopeHint: 'Tap the envelope to open it',
-    openLabel: 'Open your birthday letter',
+    envelopeHint: 'Tap the envelope — it is embarrassingly sincere inside',
+    openLabel: 'Open your letter',
     greeting: 'Dear {name},',
     paragraphs: [
-      'You are the person who turns ordinary days into little adventures — the one who shares the last dorayaki and always knows exactly how to make me laugh.',
-      'Watching you grow this year has been my favourite show. You are kinder than you give yourself credit for, braver than you think, and far funnier than the rest of us.',
-      'So here is a whole pocketful of magic, just for you. May this year be gentle with you, generous with you, and full of the small, silly joys that make you light up.',
+      'You were my first friend and my loudest one — the person who turned ordinary afternoons into blanket forts and invented games with rules only we understood. Half of who I am was shaped in those messy, giggling years with you.',
+      'We have argued over the last slice and the front seat, and made up before dinner every single time. That is the thing about us: the door slams, then someone brings tea. You have seen me at my worst and stayed anyway.',
+      'So here is my promise — wherever life puts us, I am on your side. I will answer the phone, show up when it matters, and keep believing in you on the days you cannot. Same team, always. That part never changes.',
     ],
-    closing: 'With all my love,',
-    signature: 'Your sibling',
+    closing: 'Always in your corner,',
+    signature: '— your sibling',
+    continueLabel: 'Continue',
   },
 
   /* ----------------------------------------------------------
-   *  SURPRISE MESSAGES
+   *  SCENE 5 — THE ANYWHERE DOOR + FINALE
    * ---------------------------------------------------------- */
-  surprise: {
+  door: {
     eyebrow: 'One last door',
     title: 'One more thing, {name}…',
-    message:
-      "You didn't think that was all, did you? Behind this door is the wish I've been saving for you all day.",
+    message: 'Behind this door is the only wish I have ever needed to make for us.',
     doorSign: 'Anywhere Door',
     doorHint: 'Tap the door to open it',
     doorLabel: 'Open the Anywhere Door',
-    cakeCaption: 'Close your eyes and make a wish…',
-    celebrateButton: 'Celebrate!',
-    afterCelebrate:
-      'Hooray! Consider this your official birthday applause, {name}. 🎂',
+    finale: {
+      eyebrow: 'And that is the whole surprise',
+      title: 'Wherever you go, I am already there.',
+      body: 'Any distance, any city, any year — the door still opens back to me. Same team, always.',
+      signature: '— your sibling, forever',
+      replayLabel: 'Replay from the start',
+    },
   },
 }
 
